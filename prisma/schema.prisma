@@ -1,0 +1,636 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// -------------------------------------------------------------
+// MULTILOJA & CONFIGURAÇÕES
+// -------------------------------------------------------------
+
+model Store {
+  id              String   @id @default(cuid())
+  name            String
+  tradeName       String?  // Nome Fantasia
+  documentNumber  String?  // CNPJ ou CPF
+  ie              String?  // Inscrição Estadual
+  phone           String?
+  whatsapp        String?
+  email           String?
+  zipCode         String?
+  address         String?
+  number          String?
+  complement      String?
+  neighborhood    String?
+  city            String?
+  state           String?
+  logoUrl         String?
+  isConfigured    Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relações
+  users                 User[]
+  products              Product[]
+  categories            Category[]
+  brands                Brand[]
+  customers             Customer[]
+  suppliers             Supplier[]
+  sales                 Sale[]
+  cashRegisters         CashRegister[]
+  purchases             Purchase[]
+  accountsPayable       AccountPayable[]
+  accountsReceivable    AccountReceivable[]
+  financialCategories   FinancialCategory[]
+  orders                Order[]
+  coupons               Coupon[]
+  banners               Banner[]
+  auditLogs             AuditLog[]
+  notifications         Notification[]
+  storeSettings         StoreSettings?
+  onlineStoreSettings   OnlineStoreSettings?
+}
+
+model StoreSettings {
+  id                    String   @id @default(cuid())
+  storeId               String   @unique
+  store                 Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  enablePdvDiscount     Boolean  @default(true)
+  maxDiscountPercent    Float    @default(20.0)
+  requireCustomerOnSale Boolean  @default(false)
+  autoPrintReceipt      Boolean  @default(false)
+  defaultTaxPercent     Float    @default(0.0)
+  currency              String   @default("BRL")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model OnlineStoreSettings {
+  id             String   @id @default(cuid())
+  storeId        String   @unique
+  store          Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  storeName      String   @default("Loja Online")
+  description    String?
+  primaryColor   String   @default("#0f172a")
+  secondaryColor String   @default("#2563eb")
+  accentColor    String   @default("#ec4899")
+  logoUrl        String?
+  bannerUrl      String?
+  instagramUrl   String?
+  facebookUrl    String?
+  tiktokUrl      String?
+  whatsappNumber String?
+  openingHours   String?
+  allowPickup    Boolean  @default(true)
+  allowDelivery  Boolean  @default(true)
+  minOrderValue  Float    @default(0.0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// -------------------------------------------------------------
+// USUÁRIOS, PERFIS E PERMISSÕES (RBAC)
+// -------------------------------------------------------------
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique // ADMINISTRADOR, GERENTE, CAIXA, VENDEDOR, ESTOQUISTA
+  description String?
+  isSystem    Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  code        String           @unique // ex: 'products.create', 'sales.discount', 'finance.view'
+  name        String
+  category    String           // 'VENDAS', 'PRODUTOS', 'ESTOQUE', 'FINANCEIRO', 'CONFIGURACOES'
+  createdAt   DateTime         @default(now())
+
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model User {
+  id             String    @id @default(cuid())
+  storeId        String
+  store          Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  roleId         String
+  role           Role      @relation(fields: [roleId], references: [id])
+  name           String
+  username       String    @unique
+  email          String    @unique
+  passwordHash   String
+  phone          String?
+  avatarUrl      String?
+  isActive       Boolean   @default(true)
+  lastLoginAt    DateTime?
+  resetToken     String?
+  resetExpiresAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relações
+  sales          Sale[]
+  cashRegisters  CashRegister[]
+  cashMovements  CashMovement[]
+  stockMovements StockMovement[]
+  auditLogs      AuditLog[]
+  notifications  Notification[]
+  purchases      Purchase[]
+}
+
+// -------------------------------------------------------------
+// CATÁLOGO: CATEGORIAS, MARCAS, PRODUTOS E VARIAÇÕES
+// -------------------------------------------------------------
+
+model Category {
+  id          String    @id @default(cuid())
+  storeId     String
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String
+  description String?
+  imageUrl    String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+
+  @@unique([storeId, slug])
+}
+
+model Brand {
+  id          String    @id @default(cuid())
+  storeId     String
+  store       Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+}
+
+model Product {
+  id             String           @id @default(cuid())
+  storeId        String
+  store          Store            @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  categoryId     String?
+  category       Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brandId        String?
+  brand          Brand?           @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  name           String
+  sku            String           // SKU base
+  slug           String
+  barcode        String?
+  description    String?
+  imageUrl       String?
+  gender         String?          // INFANTIL_MENINO, INFANTIL_MENINA, UNISSEX, TEEN_MASC, TEEN_FEM
+  ageGroup       String?          // BEBE (0-2), PRIMEIROS_PASSOS (2-4), INFANTIL (4-12), JUVENIL/TEEN (12-18)
+  costPrice      Float            @default(0.0)
+  sellPrice      Float            @default(0.0)
+  minStock       Int              @default(5)
+  showInOnline   Boolean          @default(false)
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  variants       ProductVariant[]
+
+  @@unique([storeId, sku])
+}
+
+model ProductVariant {
+  id             String             @id @default(cuid())
+  productId      String
+  product        Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size           String             // ex: RN, P, M, G, 1, 2, 4, 6, 8, 10, 12, 14, 16, 18
+  color          String             // ex: Azul Marinho, Rosa Claro, Branco, Preto
+  colorHex       String?            // #1E3A8A
+  sku            String             @unique // SKU específico da variação
+  barcode        String?            @unique // Código de barras específico
+  costPrice      Float?             // Se nulo, herda do produto
+  sellPrice      Float?             // Se nulo, herda do produto
+  isActive       Boolean            @default(true)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  stock          Stock?
+  stockMovements StockMovement[]
+  stockReservations StockReservation[]
+  saleItems      SaleItem[]
+  orderItems     OrderItem[]
+  purchaseItems  PurchaseItem[]
+}
+
+// -------------------------------------------------------------
+// ESTOQUE UNIFICADO, MOVIMENTAÇÕES E RESERVAS
+// -------------------------------------------------------------
+
+model Stock {
+  id               String         @id @default(cuid())
+  variantId        String         @unique
+  variant          ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity         Int            @default(0) // Estoque físico real
+  reservedQuantity Int            @default(0) // Reservado por pedidos online em processamento
+  updatedAt        DateTime       @updatedAt
+}
+
+model StockMovement {
+  id             String         @id @default(cuid())
+  variantId      String
+  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  userId         String?
+  user           User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type           String         // ENTRADA, SAIDA_PDV, SAIDA_ONLINE, AJUSTE_INVENTARIO, DEVOLUCAO, PERDA, TRANSFERENCIA
+  quantity       Int            // Quantidade movimentada (positiva para entrada, negativa para saída)
+  previousStock  Int            // Saldo antes da operação
+  newStock       Int            // Saldo após a operação
+  reason         String?        // Motivo da movimentação
+  referenceId    String?        // ID da venda, pedido online ou compra relacionada
+  createdAt      DateTime       @default(now())
+}
+
+model StockReservation {
+  id             String         @id @default(cuid())
+  variantId      String
+  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  orderId        String
+  order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  quantity       Int
+  expiresAt      DateTime       // Expira se o pedido online não for pago a tempo
+  createdAt      DateTime       @default(now())
+}
+
+// -------------------------------------------------------------
+// CLIENTES E FORNECEDORES
+// -------------------------------------------------------------
+
+model Customer {
+  id             String    @id @default(cuid())
+  storeId        String
+  store          Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name           String
+  documentNumber String?   // CPF
+  phone          String?
+  whatsapp       String?
+  email          String?
+  birthDate      DateTime?
+  zipCode        String?
+  address        String?
+  number         String?
+  complement     String?
+  neighborhood   String?
+  city           String?
+  state          String?
+  notes          String?
+  totalSpent     Float     @default(0.0)
+  totalOrders    Int       @default(0)
+  lastOrderAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  sales          Sale[]
+  orders         Order[]
+  accountsReceivable AccountReceivable[]
+}
+
+model Supplier {
+  id             String    @id @default(cuid())
+  storeId        String
+  store          Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name           String    // Nome Fantasia / Responsável
+  corporateName  String?   // Razão Social
+  documentNumber String?   // CNPJ/CPF
+  phone          String?
+  whatsapp       String?
+  email          String?
+  zipCode        String?
+  address        String?
+  number         String?
+  neighborhood   String?
+  city           String?
+  state          String?
+  notes          String?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  purchases      Purchase[]
+  accountsPayable AccountPayable[]
+}
+
+// -------------------------------------------------------------
+// CAIXA E MOVIMENTAÇÕES DE FLUXO
+// -------------------------------------------------------------
+
+model CashRegister {
+  id             String         @id @default(cuid())
+  storeId        String
+  store          Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User           @relation(fields: [userId], references: [id])
+  status         String         @default("ABERTO") // ABERTO, FECHADO
+  openedAt       DateTime       @default(now())
+  closedAt       DateTime?
+  initialBalance Float          @default(0.0) // Fundo de caixa
+  finalExpected  Float?         // Valor esperado pelo sistema
+  finalCounted   Float?         // Valor contado pelo operador
+  difference     Float?         // Diferença (sobra/falta)
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  movements      CashMovement[]
+  sales          Sale[]
+}
+
+model CashMovement {
+  id             String       @id @default(cuid())
+  cashRegisterId String
+  cashRegister   CashRegister @relation(fields: [cashRegisterId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  type           String       // SANGRIA, SUPRIMENTO, DESPESA, VENDA, ENTRADA
+  amount         Float
+  paymentMethod  String       @default("DINHEIRO") // DINHEIRO, PIX, CARTAO
+  reason         String
+  createdAt      DateTime     @default(now())
+}
+
+// -------------------------------------------------------------
+// VENDAS (PDV) E PAGAMENTOS
+// -------------------------------------------------------------
+
+model Sale {
+  id             String        @id @default(cuid())
+  storeId        String
+  store          Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  cashRegisterId String?
+  cashRegister   CashRegister? @relation(fields: [cashRegisterId], references: [id], onDelete: SetNull)
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  customerId     String?
+  customer       Customer?     @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  code           String        @unique // ex: V-10023
+  status         String        @default("CONCLUIDA") // CONCLUIDA, CANCELADA
+  subtotal       Float
+  discountAmount Float         @default(0.0)
+  totalAmount    Float
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  items          SaleItem[]
+  payments       Payment[]
+}
+
+model SaleItem {
+  id             String         @id @default(cuid())
+  saleId         String
+  sale           Sale           @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  variantId      String
+  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  quantity       Int
+  unitPrice      Float
+  costPrice      Float          @default(0.0)
+  discount       Float          @default(0.0)
+  totalPrice     Float
+}
+
+model Payment {
+  id             String   @id @default(cuid())
+  saleId         String?
+  sale           Sale?    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  orderId        String?
+  order          Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method         String   // DINHEIRO, PIX, CARTAO_DEBITO, CARTAO_CREDITO, OUTROS
+  amount         Float
+  installments   Int      @default(1)
+  receivedAmount Float?   // Para cálculo de troco em dinheiro
+  changeAmount   Float?   // Troco retornado
+  createdAt      DateTime @default(now())
+}
+
+// -------------------------------------------------------------
+// COMPRAS E ENTRADAS DE MERCADORIA
+// -------------------------------------------------------------
+
+model Purchase {
+  id             String         @id @default(cuid())
+  storeId        String
+  store          Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  supplierId     String
+  supplier       Supplier       @relation(fields: [supplierId], references: [id])
+  userId         String
+  user           User           @relation(fields: [userId], references: [id])
+  code           String         @unique // ex: COM-5001
+  status         String         @default("RECEBIDO") // PENDENTE, RECEBIDO, CANCELADO
+  totalAmount    Float
+  shippingCost   Float          @default(0.0)
+  discountAmount Float          @default(0.0)
+  notes          String?
+  receivedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  items          PurchaseItem[]
+  accountsPayable AccountPayable[]
+}
+
+model PurchaseItem {
+  id             String         @id @default(cuid())
+  purchaseId     String
+  purchase       Purchase       @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  variantId      String
+  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  quantity       Int
+  unitCost       Float
+  totalCost      Float
+}
+
+// -------------------------------------------------------------
+// FINANCEIRO: CONTAS A PAGAR, RECEBER E CATEGORIAS
+// -------------------------------------------------------------
+
+model FinancialCategory {
+  id             String            @id @default(cuid())
+  storeId        String
+  store          Store             @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name           String
+  type           String            // RECEITA, DESPESA
+  createdAt      DateTime          @default(now())
+
+  accountsPayable AccountPayable[]
+  accountsReceivable AccountReceivable[]
+}
+
+model AccountPayable {
+  id             String             @id @default(cuid())
+  storeId        String
+  store          Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  supplierId     String?
+  supplier       Supplier?          @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  purchaseId     String?
+  purchase       Purchase?          @relation(fields: [purchaseId], references: [id], onDelete: SetNull)
+  categoryId     String?
+  category       FinancialCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  description    String
+  amount         Float
+  dueDate        DateTime
+  paymentDate    DateTime?
+  status         String             @default("PENDENTE") // PENDENTE, PAGO, CANCELADO, VENCIDO
+  paymentMethod  String?
+  notes          String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+}
+
+model AccountReceivable {
+  id             String             @id @default(cuid())
+  storeId        String
+  store          Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customerId     String?
+  customer       Customer?          @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  categoryId     String?
+  category       FinancialCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  description    String
+  amount         Float
+  dueDate        DateTime
+  receivedDate   DateTime?
+  status         String             @default("PENDENTE") // PENDENTE, RECEBIDO, CANCELADO, VENCIDO
+  paymentMethod  String?
+  notes          String?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+}
+
+// -------------------------------------------------------------
+// LOJA ONLINE: PEDIDOS, ITENS, BANNERS E CUPONS
+// -------------------------------------------------------------
+
+model Order {
+  id              String             @id @default(cuid())
+  storeId         String
+  store           Store              @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customerId      String?
+  customer        Customer?          @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  orderNumber     String             @unique // ex: PED-9012
+  status          String             @default("NOVO") // NOVO, AGUARDANDO_PAGAMENTO, PAGO, EM_PREPARACAO, PRONTO_RETIRADA, ENVIADO, CONCLUIDO, CANCELADO
+  deliveryType    String             @default("RETIRADA") // RETIRADA, ENTREGA
+  customerName    String
+  customerPhone   String
+  customerWhatsapp String?
+  customerEmail   String?
+  customerDoc     String?
+  zipCode         String?
+  address         String?
+  number          String?
+  complement      String?
+  neighborhood    String?
+  city            String?
+  state           String?
+  subtotal        Float
+  shippingFee     Float              @default(0.0)
+  discountAmount  Float              @default(0.0)
+  totalAmount     Float
+  couponCode      String?
+  notes           String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  items           OrderItem[]
+  payments        Payment[]
+  reservations    StockReservation[]
+}
+
+model OrderItem {
+  id             String         @id @default(cuid())
+  orderId        String
+  order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId      String
+  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  quantity       Int
+  unitPrice      Float
+  totalPrice     Float
+}
+
+model Coupon {
+  id             String    @id @default(cuid())
+  storeId        String
+  store          Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  code           String    @unique
+  discountType   String    @default("PERCENTUAL") // PERCENTUAL, VALOR_FIXO
+  discountValue  Float
+  minValue       Float     @default(0.0)
+  maxUses        Int?
+  usedCount      Int       @default(0)
+  expiresAt      DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+}
+
+model Banner {
+  id             String   @id @default(cuid())
+  storeId        String
+  store          Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  title          String?
+  imageUrl       String
+  linkUrl        String?
+  displayOrder   Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+}
+
+// -------------------------------------------------------------
+// AUDITORIA E NOTIFICAÇÕES
+// -------------------------------------------------------------
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  storeId        String
+  store          Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userName       String
+  action         String   // ALTERACAO_PRECO, CANCELAMENTO_VENDA, EXCLUSAO_PRODUTO, AJUSTE_ESTOQUE, FECHAMENTO_CAIXA
+  entity         String   // Product, Sale, CashRegister, User, Order
+  entityId       String
+  previousValue  String?  // JSON serializado
+  newValue       String?  // JSON serializado
+  ipAddress      String?
+  createdAt      DateTime @default(now())
+}
+
+model Notification {
+  id             String   @id @default(cuid())
+  storeId        String
+  store          Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  message        String
+  type           String   @default("INFO") // INFO, ALERTA_ESTOQUE, NOVO_PEDIDO, CAIXA_DIFERENCA
+  linkUrl        String?
+  isRead         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}

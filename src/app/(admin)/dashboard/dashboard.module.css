@@ -1,0 +1,295 @@
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 0 0.75rem;
+  height: 36px;
+}
+
+.filterIcon {
+  color: var(--text-muted);
+}
+
+.periodSelect {
+  border: none;
+  background: transparent;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+}
+
+/* Grid de Indicadores */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.kpiCard {
+  border-radius: var(--radius-lg);
+}
+
+.kpiContent {
+  padding: 1.25rem;
+}
+
+.kpiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.kpiLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.kpiIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+}
+
+.primaryIcon {
+  background-color: var(--primary-50);
+  color: var(--primary-600);
+}
+
+.successIcon {
+  background-color: var(--success-bg);
+  color: var(--success-solid);
+}
+
+.infoIcon {
+  background-color: var(--info-bg);
+  color: var(--info-solid);
+}
+
+.warningIcon {
+  background-color: var(--warning-bg);
+  color: var(--warning-solid);
+}
+
+.dangerIcon {
+  background-color: var(--danger-bg);
+  color: var(--danger-solid);
+}
+
+.kpiValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.kpiFooter {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.kpiSubtext {
+  display: block;
+}
+
+/* Card de Destaque PDV */
+.pdvHighlightCard {
+  background: linear-gradient(135deg, var(--primary-700), #0f172a);
+  color: #ffffff;
+  border: none;
+}
+
+.kpiLabelHighlight {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--primary-300);
+}
+
+.pdvQuickTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0.5rem 0 0.75rem;
+}
+
+.pdvActionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.pdvActionLink:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Grid Inferior */
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 1.25rem;
+}
+
+.quickActionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+}
+
+.quickActionItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.quickActionItem:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-medium);
+  transform: translateX(2px);
+}
+
+.quickActionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--primary-50);
+  color: var(--primary-600);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.quickActionInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.quickActionInfo strong {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.quickActionInfo span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Tabela de Vendas */
+.salesTableWrapper {
+  overflow-x: auto;
+}
+
+.salesTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.salesTable th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.salesTable td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+}
+
+.salesTable tr:last-child td {
+  border-bottom: none;
+}
+
+.saleAmount {
+  font-weight: 600;
+  color: var(--primary-700);
+}
+
+.emptySales {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: var(--text-light);
+  margin-bottom: 0.75rem;
+}
+
+.emptySales p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.startSaleBtn {
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 1100px) {
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+}

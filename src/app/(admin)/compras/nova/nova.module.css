@@ -1,0 +1,351 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.breadcrumbs {
+  margin-bottom: 0.5rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--primary-600, #4f46e5);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.pageSubtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  color: #ef4444;
+  font-size: 0.875rem;
+}
+
+/* Layout Principal */
+.mainLayout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .mainLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardContentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .cardContentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.inputLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  height: 42px;
+  padding: 0 0.875rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.textarea {
+  height: auto;
+  padding: 0.75rem 0.875rem;
+  resize: vertical;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--primary-500, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* Seletor de Itens */
+.addItemForm {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr 1.2fr auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+@media (max-width: 768px) {
+  .addItemForm {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.itemFieldBtn {
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Tabela de Itens */
+.cardHeaderFlex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.itemsTableContent {
+  padding: 0;
+}
+
+.emptyItems {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  color: var(--text-muted);
+  gap: 0.75rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.itemsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.itemsTable th {
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.itemsTable td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.itemsTable td code {
+  font-size: 0.75rem;
+  background: var(--bg-secondary);
+  padding: 0.15rem 0.35rem;
+  border-radius: 3px;
+}
+
+.inlineInput {
+  width: 80px;
+  height: 32px;
+  padding: 0 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.inlineInput:focus {
+  border-color: var(--primary-500, #6366f1);
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 4px;
+}
+
+.removeBtn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Sidebar Totais */
+.totalsContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.rowLabel {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.smallInput {
+  width: 100px;
+  height: 34px;
+  padding: 0 0.5rem;
+  text-align: right;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.smallInput:focus {
+  border-color: var(--primary-500, #6366f1);
+}
+
+.finalTotalBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  text-align: right;
+}
+
+.finalTotalBox span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.finalTotalBox h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary-600, #4f46e5);
+}
+
+/* Integração Financeira */
+.financeContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.payableFields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Botões de Ação */
+.actionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.submitBtn {
+  width: 100%;
+}
+
+.cancelBtn {
+  width: 100%;
+}

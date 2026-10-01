@@ -1,0 +1,122 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.backBtn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.gridLayout {
+  display: grid;
+  grid-template-columns: 1fr 1.8fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.alertError {
+  padding: 0.75rem 1rem;
+  background-color: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-text);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  margin-bottom: 1rem;
+}
+
+.tableCardContent {
+  padding: 0;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  text-align: left;
+}
+
+.table th {
+  padding: 0.875rem 1rem;
+  background-color: var(--bg-main);
+  border-bottom: 1px solid var(--border-light);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.slugTag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.loadingState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  gap: 0.5rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 960px) {
+  .gridLayout {
+    grid-template-columns: 1fr;
+  }
+}

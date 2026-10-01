@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Loja Virtual & Catálogo Online</title>
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen pb-28">
+
+  <!-- CABEÇALHO DA LOJA -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div id="loja-logo-container" class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-600 to-indigo-700 text-white flex items-center justify-center font-black text-base shadow-sm overflow-hidden border border-slate-100">
+          <span id="loja-logo-text">LOJA</span>
+          <img id="loja-logo-img" class="w-full h-full object-cover hidden" alt="Logo da Loja" />
+        </div>
+        <div>
+          <h1 id="loja-nome" class="font-extrabold text-sm text-slate-900 leading-tight">Carregando Loja...</h1>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-[11px] font-bold text-emerald-700">Loja Aberta</span>
+            <span class="text-slate-300">•</span>
+            <span id="loja-cidade" class="text-[11px] text-slate-500">São Paulo, SP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTÃO CARRINHO FLUTUANTE HEADER -->
+      <button id="btn-abrir-carrinho" class="relative p-2.5 bg-slate-900 text-white hover:bg-slate-800 rounded-xl shadow-sm transition-all flex items-center justify-center cursor-pointer">
+        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+        <span id="carrinho-badge" class="absolute -top-1.5 -right-1.5 bg-amber-500 text-slate-950 font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-xs hidden">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- BANNER / BIOGRAFIA -->
+  <section class="max-w-2xl mx-auto px-4 pt-4">
+    <div class="p-4 bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white rounded-3xl shadow-sm space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="px-2.5 py-0.5 bg-sky-500/20 border border-sky-400/30 text-sky-200 text-[10px] font-bold rounded-full">
+          Vitrine Oficial
+        </span>
+        <span id="loja-whatsapp-badge" class="text-[11px] font-bold text-emerald-300 flex items-center gap-1">
+          <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Pedidos via WhatsApp
+        </span>
+      </div>
+      <p id="loja-bio" class="text-xs text-slate-300 leading-relaxed">
+        Bem-vindo à nossa loja! Faça seu pedido com facilidade e receba no conforto de sua casa ou retire no balcão.
+      </p>
+    </div>
+  </section>
+
+  <!-- BUSCA & CATEGORIAS -->
+  <section class="max-w-2xl mx-auto px-4 pt-4 space-y-3">
+    <!-- Barra de Pesquisa -->
+    <div class="relative">
+      <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+      <input
+        type="text"
+        id="input-busca"
+        placeholder="Buscar produto pelo nome ou código..."
+        class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-xs"
+      />
+    </div>
+
+    <!-- Pílulas de Categorias -->
+    <div id="categorias-container" class="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
+      <button class="cat-btn active px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap bg-slate-900 text-white transition-all shadow-xs" data-cat="todas">
+        Todos os Itens
+      </button>
+    </div>
+  </section>
+
+  <!-- LISTA DE PRODUTOS -->
+  <main class="max-w-2xl mx-auto px-4 pt-4">
+    <div id="produtos-grid" class="grid grid-cols-2 gap-3">
+      <!-- Cards de produtos gerados via JavaScript -->
+    </div>
+    
+    <div id="produtos-vazio" class="text-center py-12 hidden">
+      <i data-lucide="package-x" class="w-12 h-12 text-slate-300 mx-auto mb-2"></i>
+      <p class="text-sm font-bold text-slate-700">Nenhum produto encontrado</p>
+      <p class="text-xs text-slate-400">Tente buscar por outro termo ou categoria.</p>
+    </div>
+  </main>
+
+  <!-- BARRA INFERIOR FLUTUANTE DE FINALIZAÇÃO -->
+  <div id="barra-carrinho-flutuante" class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-slate-200 z-20 shadow-xl hidden">
+    <div class="max-w-2xl mx-auto flex items-center justify-between gap-3">
+      <div>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total do Pedido</p>
+        <p id="total-carrinho-flutuante" class="text-lg font-black text-slate-900 leading-tight">R$ 0,00</p>
+      </div>
+
+      <button id="btn-finalizar-pedido" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl shadow-md flex items-center gap-2 text-xs transition-all cursor-pointer">
+        <span>Ver Carrinho & Pedir</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL / DRAWER DO CARRINHO DE COMPRAS -->
+  <div id="modal-carrinho" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-200">
+      
+      <!-- Cabeçalho Modal -->
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-2">
+          <i data-lucide="shopping-bag" class="w-5 h-5 text-sky-600"></i>
+          <h3 class="font-extrabold text-sm text-slate-900">Seu Carrinho de Compras</h3>
+        </div>
+        <button id="btn-fechar-carrinho" class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-xl transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Itens do Carrinho -->
+      <div id="itens-carrinho-container" class="p-4 overflow-y-auto flex-1 divide-y divide-slate-100 space-y-3">
+        <!-- Injetado dinamicamente -->
+      </div>
+
+      <!-- Formulário de Entrega e Pagamento -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 space-y-3 text-xs overflow-y-auto max-h-[40vh]">
+        <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider">Dados para Entrega / Retirada</h4>
+        
+        <div class="grid grid-cols-2 gap-2">
+          <div class="col-span-2">
+            <label class="block font-bold text-slate-700 mb-0.5">Seu Nome Completo *:</label>
+            <input type="text" id="input-cliente-nome" placeholder="Ex: Maria Silva" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-bold bg-white" required />
+          </div>
+
+          <div class="col-span-2">
+            <label class="block font-bold text-slate-700 mb-0.5">Seu WhatsApp / Telefone *:</label>
+            <input type="tel" id="input-cliente-telefone" placeholder="(11) 98765-4321" class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-mono" required />
+          </div>
+
+          <div class="col-span-2">
+            <label class="block font-bold text-slate-700 mb-0.5">Tipo de Pedido:</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="flex items-center gap-2 p-2 border border-slate-300 rounded-xl cursor-pointer bg-white font-bold text-[11px]">
+                <input type="radio" name="tipo-entrega" value="entrega" checked class="text-sky-600" />
+                <span>Delivery (Entrega)</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 border border-slate-300 rounded-xl cursor-pointer bg-white font-bold text-[11px]">
+                <input type="radio" name="tipo-entrega" value="retirada" class="text-sky-600" />
+                <span>Retirar no Balcão</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="campo-endereco" class="col-span-2 space-y-1">
+            <label class="block font-bold text-slate-700">Endereço de Entrega (Rua, Nº, Bairro):</label>
+            <input type="text" id="input-cliente-endereco" placeholder="Ex: Rua das Flores, 120, Apto 4" class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white" />
+          </div>
+
+          <div class="col-span-2">
+            <label class="block font-bold text-slate-700 mb-0.5">Forma de Pagamento:</label>
+            <select id="select-forma-pagamento" class="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-bold text-slate-800">
+              <option value="pix">PIX (Chave enviada no WhatsApp)</option>
+              <option value="cartao_entrega">Cartão na Entrega (Maquininha)</option>
+              <option value="dinheiro">Dinheiro (Informar troco)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Resumo de Valores -->
+        <div class="pt-2 border-t border-slate-200 space-y-1 text-slate-600 font-medium">
+          <div class="flex justify-between">
+            <span>Subtotal dos Produtos:</span>
+            <span id="modal-subtotal" class="font-bold text-slate-800">R$ 0,00</span>
+          </div>
+          <div class="flex justify-between text-emerald-700">
+            <span>Taxa de Entrega:</span>
+            <span id="modal-frete" class="font-bold">Grátis</span>
+          </div>
+          <div class="flex justify-between text-base font-black text-slate-900 pt-1 border-t border-slate-200">
+            <span>Total Final:</span>
+            <span id="modal-total" class="text-emerald-700">R$ 0,00</span>
+          </div>
+        </div>
+
+        <!-- Botão de Envio para o WhatsApp -->
+        <button id="btn-confirmar-whatsapp" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 text-sm transition-all cursor-pointer">
+          <i data-lucide="message-circle" class="w-5 h-5 fill-white"></i>
+          <span>Enviar Pedido para o WhatsApp</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCRIPT DA LOJA VIRTUAL -->
+  <script>
+    // Estado local da Loja Virtual
+    let produtosLoja = [];
+    let carrinho = [];
+    let lojaConfig = {
+      nome: "NexPDV - Moda & Loja Modelo",
+      whatsapp: "5511998876655",
+      cidade: "São Paulo, SP",
+      bio: "As melhores roupas e acessórios com entrega rápida e pagamento via PIX no WhatsApp.",
+      taxaEntrega: 0
+    };
+
+    // Produtos mock/iniciais caso carregue standalone
+    const produtosIniciais = [
+      { id: 1, nome: "Camiseta Básica 100% Algodão", categoria: "Vestuário", preco_venda: 59.90, estoque_atual: 35, imagem_url: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop&q=60" },
+      { id: 2, nome: "Calça Jeans Slim Confort", categoria: "Vestuário", preco_venda: 129.90, estoque_atual: 18, imagem_url: "https://images.unsplash.com/photo-1542272604-780c96856592?w=500&auto=format&fit=crop&q=60" },
+      { id: 3, nome: "Vestido Floral Verão Elegance", categoria: "Vestuário", preco_venda: 119.00, estoque_atual: 12, imagem_url: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500&auto=format&fit=crop&q=60" },
+      { id: 4, nome: "Tênis Esportivo Casual Street", categoria: "Calçados", preco_venda: 179.90, estoque_atual: 14, imagem_url: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&auto=format&fit=crop&q=60" },
+      { id: 5, nome: "Boné Aba Curva Trucker", categoria: "Acessórios", preco_venda: 45.00, estoque_atual: 22, imagem_url: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&auto=format&fit=crop&q=60" },
+      { id: 6, nome: "Refrigerante Coca-Cola 350ml", categoria: "Bebidas", preco_venda: 6.00, estoque_atual: 48, imagem_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&auto=format&fit=crop&q=60" }
+    ];
+
+    function formatMoeda(val) {
+      return (val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function initLoja() {
+      produtosLoja = [...produtosIniciais];
+      document.getElementById('loja-nome').innerText = lojaConfig.nome;
+      document.getElementById('loja-cidade').innerText = lojaConfig.cidade;
+      document.getElementById('loja-bio').innerText = lojaConfig.bio;
+
+      renderCategorias();
+      renderProdutos();
+      lucide.createIcons();
+    }
+
+    function renderCategorias() {
+      const cats = ['todas', ...new Set(produtosLoja.map(p => p.categoria).filter(Boolean))];
+      const container = document.getElementById('categorias-container');
+      container.innerHTML = cats.map(c => `
+        <button class="cat-btn px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all ${c === 'todas' ? 'bg-slate-900 text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}" data-cat="${c}">
+          ${c === 'todas' ? 'Todos os Itens' : c}
+        </button>
+      `).join('');
+
+      container.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          container.querySelectorAll('.cat-btn').forEach(b => {
+            b.className = 'cat-btn px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all bg-white text-slate-700 border border-slate-200 hover:bg-slate-100';
+          });
+          btn.className = 'cat-btn px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all bg-slate-900 text-white shadow-xs';
+          filtrarProdutos(btn.dataset.cat, document.getElementById('input-busca').value);
+        });
+      });
+    }
+
+    function renderProdutos(lista = produtosLoja) {
+      const grid = document.getElementById('produtos-grid');
+      const vazio = document.getElementById('produtos-vazio');
+
+      if (lista.length === 0) {
+        grid.innerHTML = '';
+        vazio.classList.remove('hidden');
+        return;
+      }
+
+      vazio.classList.add('hidden');
+      grid.innerHTML = lista.map(p => `
+        <div class="bg-white border border-slate-200 rounded-3xl p-3 flex flex-col justify-between shadow-xs hover:shadow-md transition-all group">
+          <div>
+            <div class="w-full h-36 bg-slate-100 rounded-2xl overflow-hidden mb-2.5 flex items-center justify-center relative">
+              ${p.imagem_url ? `
+                <img src="${p.imagem_url}" alt="${p.nome}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              ` : `
+                <i data-lucide="package" class="w-8 h-8 text-slate-300"></i>
+              `}
+              <span class="absolute top-2 left-2 bg-white/90 backdrop-blur-xs text-slate-700 font-bold text-[10px] px-2 py-0.5 rounded-full border border-slate-200 shadow-xs">
+                ${p.categoria || 'Geral'}
+              </span>
+            </div>
+            <h4 class="font-bold text-xs text-slate-800 line-clamp-2 leading-snug mb-1">${p.nome}</h4>
+          </div>
+
+          <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
+            <div>
+              <p class="text-[10px] text-slate-400 font-medium">Preço</p>
+              <p class="font-black text-sm text-slate-900 leading-none">${formatMoeda(p.preco_venda)}</p>
+            </div>
+
+            <button onclick="adicionarAoCarrinho(${p.id})" class="p-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl shadow-xs transition-colors flex items-center justify-center cursor-pointer">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function filtrarProdutos(categoria, busca) {
+      let filtrados = produtosLoja;
+      if (categoria && categoria !== 'todas') {
+        filtrados = filtrados.filter(p => p.categoria === categoria);
+      }
+      if (busca && busca.trim() !== '') {
+        const termo = busca.toLowerCase();
+        filtrados = filtrados.filter(p => p.nome.toLowerCase().includes(termo));
+      }
+      renderProdutos(filtrados);
+    }
+
+    document.getElementById('input-busca').addEventListener('input', (e) => {
+      const catAtiva = document.querySelector('.cat-btn.bg-slate-900')?.dataset?.cat || 'todas';
+      filtrarProdutos(catAtiva, e.target.value);
+    });
+
+    window.adicionarAoCarrinho = function(produtoId) {
+      const p = produtosLoja.find(x => x.id === produtoId);
+      if (!p) return;
+
+      const itemExistente = carrinho.find(x => x.id === produtoId);
+      if (itemExistente) {
+        itemExistente.quantidade += 1;
+      } else {
+        carrinho.push({ ...p, quantidade: 1 });
+      }
+      atualizarCarrinhoUI();
+    };
+
+    window.alterarQtdCarrinho = function(produtoId, delta) {
+      const item = carrinho.find(x => x.id === produtoId);
+      if (!item) return;
+
+      item.quantidade += delta;
+      if (item.quantidade <= 0) {
+        carrinho = carrinho.filter(x => x.id !== produtoId);
+      }
+      atualizarCarrinhoUI();
+    };
+
+    function atualizarCarrinhoUI() {
+      const totalQtd = carrinho.reduce((sum, i) => sum + i.quantidade, 0);
+      const subtotal = carrinho.reduce((sum, i) => sum + (i.preco_venda * i.quantidade), 0);
+      const total = subtotal + lojaConfig.taxaEntrega;
+
+      // Badge no Header
+      const badge = document.getElementById('carrinho-badge');
+      if (totalQtd > 0) {
+        badge.innerText = totalQtd;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      // Barra Flutuante Inferior
+      const barra = document.getElementById('barra-carrinho-flutuante');
+      if (totalQtd > 0) {
+        barra.classList.remove('hidden');
+        document.getElementById('total-carrinho-flutuante').innerText = formatMoeda(total);
+      } else {
+        barra.classList.add('hidden');
+      }
+
+      // Modal do Carrinho
+      const containerItens = document.getElementById('itens-carrinho-container');
+      if (carrinho.length === 0) {
+        containerItens.innerHTML = '<p class="text-center text-slate-400 py-8">Seu carrinho está vazio.</p>';
+      } else {
+        containerItens.innerHTML = carrinho.map(item => `
+          <div class="flex items-center justify-between py-2 gap-2">
+            <div class="flex-1">
+              <h5 class="font-bold text-slate-800 text-xs">${item.nome}</h5>
+              <p class="text-[11px] text-slate-500">${formatMoeda(item.preco_venda)} x ${item.quantidade} = <strong class="text-slate-900">${formatMoeda(item.preco_venda * item.quantidade)}</strong></p>
+            </div>
+            <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+              <button onclick="alterarQtdCarrinho(${item.id}, -1)" class="w-6 h-6 bg-white rounded-lg font-black text-slate-700 flex items-center justify-center shadow-2xs hover:bg-slate-200">-</button>
+              <span class="w-6 text-center font-bold text-xs">${item.quantidade}</span>
+              <button onclick="alterarQtdCarrinho(${item.id}, 1)" class="w-6 h-6 bg-white rounded-lg font-black text-slate-700 flex items-center justify-center shadow-2xs hover:bg-slate-200">+</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('modal-subtotal').innerText = formatMoeda(subtotal);
+      document.getElementById('modal-total').innerText = formatMoeda(total);
+      lucide.createIcons();
+    }
+
+    // Abertura e Fechamento do Modal do Carrinho
+    const modal = document.getElementById('modal-carrinho');
+    document.getElementById('btn-abrir-carrinho').addEventListener('click', () => modal.classList.remove('hidden'));
+    document.getElementById('btn-finalizar-pedido').addEventListener('click', () => modal.classList.remove('hidden'));
+    document.getElementById('btn-fechar-carrinho').addEventListener('click', () => modal.classList.add('hidden'));
+
+    // Alternar campo de endereço no radio
+    document.querySelectorAll('input[name="tipo-entrega"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        const campoEnd = document.getElementById('campo-endereco');
+        if (e.target.value === 'retirada') {
+          campoEnd.classList.add('hidden');
+        } else {
+          campoEnd.classList.remove('hidden');
+        }
+      });
+    });
+
+    // Gravar Pedido Diretamente no Sistema / Supabase (Sem enviar pelo WhatsApp)
+    document.getElementById('btn-confirmar-whatsapp').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-confirmar-whatsapp');
+      const nome = document.getElementById('input-cliente-nome').value.trim();
+      const telefone = document.getElementById('input-cliente-telefone').value.trim();
+      const tipoEntrega = document.querySelector('input[name="tipo-entrega"]:checked').value;
+      const endereco = document.getElementById('input-cliente-endereco').value.trim();
+      const formaPagto = document.getElementById('select-forma-pagamento').value;
+
+      if (!nome || !telefone) {
+        alert('Por favor, informe seu Nome e Telefone para concluir o pedido.');
+        return;
+      }
+
+      if (tipoEntrega === 'entrega' && !endereco) {
+        alert('Por favor, informe seu Endereço completo para entrega.');
+        return;
+      }
+
+      if (carrinho.length === 0) {
+        alert('Seu carrinho está vazio!');
+        return;
+      }
+
+      const subtotal = carrinho.reduce((sum, i) => sum + (i.preco_venda * i.quantidade), 0);
+      const taxa = tipoEntrega === 'entrega' ? lojaConfig.taxaEntrega : 0;
+      const total = subtotal + taxa;
+
+      const payloadPedido = {
+        loja_id: 1,
+        slug_loja: lojaConfig.slug,
+        cliente: nome,
+        cliente_telefone: telefone,
+        cliente_endereco: tipoEntrega === 'entrega' ? endereco : 'Retirada no Balcão da Loja',
+        itens: carrinho.map(item => ({
+          id: item.id,
+          nome: item.nome,
+          quantidade: item.quantidade,
+          preco_unitario: item.preco_venda,
+          subtotal: item.preco_venda * item.quantidade
+        })),
+        subtotal,
+        taxa_entrega: taxa,
+        total,
+        entrega: tipoEntrega,
+        pagamento: formaPagto,
+        status: 'novo',
+        criado_em: new Date().toISOString()
+      };
+
+      btn.disabled = true;
+      btn.innerText = 'Enviando Pedido ao Sistema...';
+
+      try {
+        // Envia para o backend / Supabase
+        const pedidosLocais = JSON.parse(localStorage.getItem('nexpdv_pedidos_catalogo') || '[]');
+        payloadPedido.id = Date.now();
+        pedidosLocais.unshift(payloadPedido);
+        localStorage.setItem('nexpdv_pedidos_catalogo', JSON.stringify(pedidosLocais));
+
+        // Dispara evento para sincronização caso esteja na mesma janela/browser
+        window.dispatchEvent(new CustomEvent('novo-pedido-catalogo', { detail: payloadPedido }));
+
+        modal.classList.add('hidden');
+        carrinho = [];
+        atualizarCarrinhoUI();
+
+        // Limpar campos
+        document.getElementById('input-cliente-nome').value = '';
+        document.getElementById('input-cliente-telefone').value = '';
+        document.getElementById('input-cliente-endereco').value = '';
+
+        alert(`🎉 Pedido #${payloadPedido.id} recebido com sucesso!\n\nSeu pedido entrou direto no sistema do lojista e está aguardando confirmação. Obrigado pela preferência!`);
+      } catch (err) {
+        alert('Erro ao enviar pedido: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Finalizar Pedido no Sistema';
+        lucide.createIcons();
+      }
+    });
+
+    // Iniciar
+    initLoja();
+  </script>
+</body>
+</html>
